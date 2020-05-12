@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+
+    <!-- template for menu -->
+    <script id="menuitems" type="text/template">
+        {% raw -%}
+        <li class="active">
+            <a href="" class="channel-link" data-page="{{ data_id }}">
+                {{ channelname }}
+            </a>
+        </li>
+        {%- endraw %}
+    </script>
+
+    <!-- template for chats -->
+    <script id="chatitem" type="text/template">
+        {% raw -%}
+        
+        <li class="displayname">
+            {{ username }} 
+            <span class="timestamp">
+                {{ date }}
+            </span>
+        </li>
+        <li class="messagebubble">
+            {{ message }}
+        </li>
+        
+        {%- endraw %}
+    </script>
+
+    <!-- template for contacts -->
+    <script id="contactlist" type="text/template">
+        {% raw -%}
+            
+        <option id="{{name}}">{{name}}</option>
+            
+        {%- endraw %}
+    </script>
+
+
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+
+
+    <title>Flack</title>
+</head>
+
+<body>
+    <!-- Sign up -->
+    <div class="modal fade" id="signup" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="signupLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupLabel">Welcome to Flack</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="register">
+                    <div class="modal-body">
+                        Please choose a display name
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">@</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Username" aria-label="Username"
+                                aria-describedby="addon-wrapping" autocomplete="off" id="username">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Channel Creation -->
+    <div class="modal fade" id="createchannel" data-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="signupLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="signupLabel">Create New Channel</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="newchannel">
+                    <div class="modal-body">
+                        <span id="channelinstruct">
+                            Please give channel an unqiue name
+                        </span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">#</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Channel Name" aria-label="Channel Name"
+                                aria-describedby="addon-wrapping" autocomplete="off" id="channelname">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit" id="create">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Private Message -->
+    <div class="modal fade" id="pm-modal" data-backdrop="static" tabindex="-1" role="dialog"
+        aria-labelledby="signupLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pm-label">Private Message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="pm-form">
+                    <div class="modal-body">
+                        <span id="pm-instruct">
+                            Choose from Contacts:
+                        </span>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="addon-wrapping">@</span>
+                            </div>
+                            <select class="form-control" id="pm-contacts">
+
+
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" type="submit" id="pm-chat">Chat</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="main">
+        <div class="row">
+            <div class="col-3">
+                <section id="menu">
+                    <h2>Channels <span><button class="btn btn-primary btn-sm" type="button"
+                                id="channel">+</button></span>
+                    </h2>
+                    <!-- load channels with Flask -->
+                    <ul id="channels">
+                        {% for channel in channels %}
+                        <li class="active">
+                            <a href="" class="channel-link" data-page="{{ channel.id }}">
+                                {{ channel.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <h2>Direct messages <span><button class="btn btn-primary btn-sm" type="button"
+                                id="newmessage">+</button></span>
+                    </h2>
+                    <!-- load relevant contacts with AJAX -->
+                    <ul id="active-contacts">
+                        {% for contact in contacts %}
+                        <li class="active">
+                            <a href="" class="channel-link" data-page="{{ contact.id }}">
+                                {{ contact.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <hr>
+                    <div class="user">Display name: @<span id="displayname"></span></div>
+                </section>
+            </div>
+
+            <div class="col-9">
+                <div class="topframe">
+                    <h2 id="channelheader"></h2>
+                    <p style="display: none;">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vero
+                        dolor labore id delectus eius,
+                        exercitationem magni non aut recusandae cupiditate adipisci tempore quia, magnam autem
+                        accusantium
+                        neque
+                        quae quo pariatur.</p>
+                    <hr>
+                </div>
+
+                <div class="messageframe">
+                    <ul id="messagebody">
+                    </ul>
+                </div>
+
+                <div class="textframe">
+                    <section id="textbox">
+                        <form>
+                            <div class="form-group">
+                                <textarea class="form-control" name="textbox" rows="3" id="message"></textarea>
+                            </div>
+                            <button class="btn btn-primary btn-sm" type="submit" id="sendmessage">Send</button>
+                        </form>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

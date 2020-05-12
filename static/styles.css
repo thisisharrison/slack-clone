@@ -1,0 +1,65 @@
+#menu {
+    background-color: #3f0f3f;
+    height:100%;
+    margin: 0;
+    color: white;
+    overflow: hidden;
+}
+#menu h2 {
+    padding-left: 10px;
+}
+li > a {
+    color: #ACB1B7;
+}
+.active > a {
+    color: white;
+    font-weight: bold;
+}
+a:hover{
+    color: white;
+    text-decoration: none;
+}
+/* main */
+html, body {
+    height: 100vh !important;
+    margin: 0px !important;
+}
+.main {
+    height: 100vh !important;
+}
+/* menu */
+.col3 {
+    position: absolute; 
+    bottom: 0; 
+    height: 100vh !important;
+}
+/* topframe */
+/* textframe */
+
+.col-9 {
+    bottom: 0px;
+    height: 100vh !important;
+}
+.textframe {
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    
+}
+
+.user {
+    margin-left: 10px;
+    float: bottom;
+    bottom: 0;
+}
+.displayname {
+    list-style-type: none;
+    font-weight: bolder;
+}
+.timestamp {
+    font-weight: lighter;
+    color: grey;
+}
+
+/* New color theme #2E294E #1B998B #F1FFE7 #FFFFFF */
+/* https://coolors.co/2e294e-1b998b-f1ffe7-ffffff */
