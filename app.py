@@ -151,7 +151,7 @@ def message(data):
     print(total)
 
     # remove the 101 message to keep first 100 messages in the channel
-    if len(total) > 5:
+    if len(total) > 100:
         counter = -1
         for i in texts:
             counter += 1
