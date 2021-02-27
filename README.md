@@ -1,6 +1,6 @@
-# Project 2
+# Project 2 - Slack Clone
 
-Web Programming with Python and JavaScript
+CS50 Web Programming with Python and JavaScript
 
 Display Name: Using Bootstrap modal, user comes into the site and register if local storage does not have their username. 
 
